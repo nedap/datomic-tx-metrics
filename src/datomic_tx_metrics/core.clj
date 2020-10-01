@@ -11,7 +11,6 @@
                                          GarbageCollectorExports ThreadExports
                                          ClassLoadingExports VersionInfoExports]))
 
-
 ;; ---- Metrics ----------------------------------------------------------------
 
 (prom/defgauge alarms
@@ -191,12 +190,7 @@
     (.register object-cache-hits-ratio)
     (.register garbage-segments)
     (.register heartbeats-seconds)
-    (.register heartbeats)
-    ))
-
-
-
-;; ---- Server -----------------------------------------------------------------
+    (.register heartbeats)))
 
 (defn- msec-to-sec
   "Converts a `value` given in msec to sec."
@@ -209,13 +203,64 @@
   [value]
   (* (double value) 1000000))
 
+;; ---- Server -----------------------------------------------------------------
+(def server (atom nil))
 
+(defn- wrap-not-found
+  "Middleware which returns a 404 response if no downstream handler can be
+   found processing a request. Otherwise forwards the request to the found
+   handler as well as its response to the caller."
+  [handler]
+  (fn [req]
+    (if-let [resp (handler req)]
+      resp
+      {:status 404
+       :header {:content-type "text/plain"}
+       :body "Not Found"})))
+
+
+(defn- health-handler
+  "Health handler returning a 200 response code with 'OK' as a response body."
+  [_]
+  {:status 200 :body "OK"})
+
+
+(defn- metrics-handler
+  "Metrics handler returning the transactor and JVM metrics of a transactor."
+  [_]
+  (prom/dump-metrics metrics-registry))
+
+
+(def ^:private routes
+  "Defines the routes for the web server."
+  ["/"
+   [["health" {:get health-handler}]
+    ["metrics" {:get metrics-handler}]]])
+
+(defn- routing
+  "Creates a ring handler for routing requests to the appropriate sub-handler
+   based on `routes`."
+  [routes]
+  (-> (bidi/make-handler routes)
+      (wrap-not-found)))
+
+
+(defn- start-metrics-server
+  "Starts the web server that can be used to scrape transactor + JVM metrics."
+  []
+  (let [metrics-port (Integer/parseInt (or (:metrics-port env) "11509"))]
+    (log/info "Starting metrics server on port " metrics-port)
+    (http/start-server (routing routes) {:port metrics-port})))
 
 ;; ---- Callback ---------------------------------------------------------------
 
 (defn tx-metrics-callback-handler
   "Called by Datomic transactor transferring its metrics."
   [tx-metrics]
+  ;; If no server was running, start one now.
+  (swap! server (fn [server] (when-not server
+                               (start-metrics-server))))
+
   (if-let [{:keys [sum]} (:AlarmIndexingJobFailed tx-metrics)]
     (prom/set! alarms "index-job-failed" sum)
     (prom/set! alarms "index-job-failed" 0))
@@ -230,16 +275,16 @@
 
   (->> (keys tx-metrics)
        (filter
-         (fn [key]
-           (and (string/starts-with? (name key) "Alarm")
-                (not= key :Alarm)
-                (not= key :AlarmIndexingJobFailed)
-                (not= key :AlarmBackPressure)
-                (not= key :AlarmUnhandledException))))
+        (fn [key]
+          (and (string/starts-with? (name key) "Alarm")
+               (not= key :Alarm)
+               (not= key :AlarmIndexingJobFailed)
+               (not= key :AlarmBackPressure)
+               (not= key :AlarmUnhandledException))))
        (reduce
-         (fn [count {:keys [sum]}]
-           (+ count sum))
-         0)
+        (fn [count {:keys [sum]}]
+          (+ count sum))
+        0)
        (prom/set! alarms "other"))
 
   (when-let [mb (:AvailableMB tx-metrics)]
@@ -347,57 +392,4 @@
 
   (when-let [{:keys [sum count]} (:HeartbeatMsec tx-metrics)]
     (prom/set! heartbeats-seconds (msec-to-sec sum))
-    (prom/set! heartbeats count))
-  )
-
-;; ---- Server -----------------------------------------------------------------
-
-(defn- wrap-not-found
-  "Middleware which returns a 404 response if no downstream handler can be
-   found processing a request. Otherwise forwards the request to the found
-   handler as well as its response to the caller."
-  [handler]
-  (fn [req]
-    (if-let [resp (handler req)]
-      resp
-      {:status 404
-       :header {:content-type "text/plain"}
-       :body "Not Found"})))
-
-
-(defn- health-handler
-  "Health handler returning a 200 response code with 'OK' as a response body."
-  [_]
-  {:status 200 :body "OK"})
-
-
-(defn- metrics-handler
-  "Metrics handler returning the transactor and JVM metrics of a transactor."
-  [_]
-  (prom/dump-metrics metrics-registry))
-
-
-(def ^:private routes
-  "Defines the routes for the web server."
-  ["/"
-   [["health" {:get health-handler}]
-    ["metrics" {:get metrics-handler}]]])
-
-
-(defn- routing
-  "Creates a ring handler for routing requests to the appropriate sub-handler
-   based on `routes`."
-  [routes]
-  (-> (bidi/make-handler routes)
-      (wrap-not-found)))
-
-
-(defn- start-metrics-server
-  "Starts the web server that can be used to scrape transactor + JVM metrics."
-  []
-  (let [metrics-port (Integer/parseInt (or (:metrics-port env) "11509"))]
-    (log/info "Starting metrics server on port " metrics-port)
-    (http/start-server (routing routes) {:port metrics-port})))
-
-
-(start-metrics-server)
+    (prom/set! heartbeats count)))
