@@ -44,7 +44,7 @@ jobs:
           command: lein with-profile -dev,+ci run -m nedap.ci.release-workflow.api sanity-check
       - run:
           name: release uberjar to JFrog
-          command: lein uberjar-deploy
+          command: lein deploy-uberjar releases
 
 workflows:
   version: 2
