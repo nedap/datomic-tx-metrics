@@ -10,6 +10,8 @@
                  [prom-metrics "0.5-alpha2"]
                  [ring/ring-core "1.7.1"]]
 
+  :plugins [[camechis/deploy-uberjar "0.3.0"]]
+
   :signing {:gpg-key "releases-staffingsolutions@nedap.com"}
 
   :repositories {"releases" {:url      "https://nedap.jfrog.io/nedap/staffing-solutions/"
