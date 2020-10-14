@@ -1,4 +1,4 @@
-(defproject com.nedap.staffing-solutions/datomic-tx-metrics "0.4.0-alpha4"
+(defproject com.nedap.staffing-solutions/datomic-tx-metrics "0.4.0-alpha5"
   :description "Containing a callback handler for collecting Datomic Transactor + JVM metrics for consumption (e.g. by Prometheus) using a web endpoint offered by the included web server."
   :dependencies [[aleph "0.4.6"]
                  [bidi "2.1.6"]
