@@ -12,6 +12,8 @@
 
   :plugins [[camechis/deploy-uberjar "0.3.0"]]
 
+  :uberjar-name "datomic-tx-metrics-%s-standalone.jar"
+
   :signing {:gpg-key "releases-staffingsolutions@nedap.com"}
 
   :repositories {"releases" {:url      "https://nedap.jfrog.io/nedap/staffing-solutions/"
