@@ -12,7 +12,9 @@
 
   :plugins [[camechis/deploy-uberjar "0.3.0"]]
 
-  :uberjar-name "datomic-tx-metrics-%s-standalone.jar"
+  :jar-name "doesnt-matter.jar"
+
+  :uberjar-name "datomic-tx-metrics-%s.jar"
 
   :signing {:gpg-key "releases-staffingsolutions@nedap.com"}
 
