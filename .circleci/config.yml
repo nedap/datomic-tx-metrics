@@ -43,8 +43,8 @@ jobs:
           name: Perform pre-release sanity check
           command: lein with-profile -dev,+ci run -m nedap.ci.release-workflow.api sanity-check
       - run:
-          name: release to JFrog
-          command: lein deploy
+          name: release uberjar to JFrog
+          command: lein do uberjar, pom, deploy repo :project/version :project/uberjar-name pom.xml
 
 workflows:
   version: 2
