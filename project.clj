@@ -4,17 +4,16 @@
                  [bidi "2.1.6"]
                  [com.taoensso/timbre "4.10.0"]
                  [environ "1.1.0"]
-                 [io.prometheus/simpleclient "0.6.0" #_"transitive"]
                  [io.prometheus/simpleclient_hotspot "0.5.0"]
                  [org.clojure/clojure "1.10.1"]
                  [prom-metrics "0.5-alpha2"]
                  [ring/ring-core "1.7.1"]]
 
+  :managed-dependencies [[io.prometheus/simpleclient "0.6.0"]]
+
   :plugins [[camechis/deploy-uberjar "0.3.0"]]
 
-  :jar-name "doesnt-matter.jar"
-
-  :uberjar-name "datomic-tx-metrics-%s.jar"
+  :uberjar-name "datomic-tx-metrics-%s-standalone.jar"
 
   :signing {:gpg-key "releases-staffingsolutions@nedap.com"}
 
