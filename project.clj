@@ -9,6 +9,8 @@
                  [prom-metrics "0.5-alpha2"]
                  [ring/ring-core "1.7.1"]]
 
+  :exclusions [org.clojure/tools.reader #_"provided by datomic"]
+
   :managed-dependencies [[io.prometheus/simpleclient "0.6.0"]]
 
   :plugins [[camechis/deploy-uberjar "0.3.0"]]
