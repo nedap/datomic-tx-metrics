@@ -7,9 +7,8 @@
                  [io.prometheus/simpleclient_hotspot "0.5.0"]
                  [org.clojure/clojure "1.10.1"]
                  [prom-metrics "0.5-alpha2"]
+                 [org.clojure/tools.reader "1.2.2" #_"version datomic requires at the very least"]
                  [ring/ring-core "1.7.1"]]
-
-  :exclusions [org.clojure/tools.reader #_"provided by datomic"]
 
   :managed-dependencies [[io.prometheus/simpleclient "0.6.0"]]
 
