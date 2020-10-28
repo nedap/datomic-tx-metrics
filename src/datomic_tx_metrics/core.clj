@@ -628,7 +628,7 @@
 
   (if-let [{:keys [sum]} (:FulltextSegments tx-metrics)]
     (prom/set! fulltext-segments   service-name sum)
-    (prom/clear! fulltext-segments service-name 0))
+    (prom/clear! fulltext-segments))
 
   (when-let [{:keys [sum count]} (:LogIngestBytes tx-metrics)]
     (prom/inc! log-ingest-bytes-count-total service-name count)
