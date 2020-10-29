@@ -566,12 +566,12 @@
     (prom/set! index-segments service-name 0))
 
   (when-let [{:keys [sum count]} (:IndexWrites tx-metrics)]
-    (prom/set! index-writes-count-total service-name count)
-    (prom/set! index-writes-count-total service-name sum))
+    (prom/inc! index-writes-count-total service-name count)
+    (prom/inc! index-writes-sum-total service-name sum))
 
   (when-let [{:keys [sum count]} (:IndexWriteMsec tx-metrics)]
-    (prom/inc! index-writes-count-total service-name count)
-    (prom/inc! index-writes-sum-total   service-name (msec-to-sec sum)))
+    (prom/inc! index-writes-seconds-count-total service-name count)
+    (prom/inc! index-writes-seconds-sum-total   service-name (msec-to-sec sum)))
 
   (if-let [{:keys [sum]} (:CreateEntireIndexMsec tx-metrics)]
     (prom/set! create-entire-index-seconds service-name (msec-to-sec sum))
@@ -618,7 +618,7 @@
 
   (when-let [{:keys [sum count]} (:HeartbeatMsec tx-metrics)]
     (prom/inc! heartbeat-seconds-count-total       service-name count)
-    (prom/set! heartbeat-seconds-seconds-sum-total service-name (msec-to-sec sum)))
+    (prom/inc! heartbeat-seconds-seconds-sum-total service-name (msec-to-sec sum)))
 
   ;; Missing transactor stats
   (if-let [{:keys [sum]} (:ClusterCreateFS tx-metrics)]
