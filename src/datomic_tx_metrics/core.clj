@@ -613,7 +613,7 @@
     (prom/inc! object-cache-sum-total   service-name sum))
 
   (when-let [{:keys [sum count]} (:GarbageSegments tx-metrics)]
-    (prom/inc! garbage-segments-sum-total service-name count)
+    (prom/inc! garbage-segments-count-total service-name count)
     (prom/inc! garbage-segments-sum-total service-name sum))
 
   (when-let [{:keys [sum count]} (:HeartbeatMsec tx-metrics)]
