@@ -500,16 +500,16 @@
     (prom/set! alarms service-name "unhandled-exception" sum)
     (prom/set! alarms service-name "unhandled-exception" 0))
 
-  (->> (keys tx-metrics)
+  (->> tx-metrics
        (filter
-        (fn [key]
-          (and (string/starts-with? (name key) "Alarm")
+        (fn [[k _]]
+          (and (string/starts-with? (name k) "Alarm")
                (not= key :Alarm)
                (not= key :AlarmIndexingJobFailed)
                (not= key :AlarmBackPressure)
                (not= key :AlarmUnhandledException))))
        (reduce
-        (fn [count {:keys [sum]}]
+        (fn [count [_ {:keys [sum]}]]
           (+ count sum))
         0)
        (prom/set! alarms service-name "other"))

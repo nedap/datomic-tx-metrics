@@ -10,9 +10,11 @@
 
   (are [input] (do (sut/tx-metrics-callback-handler input)
                    true)
+    {:Alarm {:sum 1 :count 1}}
     {:AlarmIndexingJobFailed {:sum 1 :count 1}}
     {:AlarmBackPressure {:sum 1 :count 1}}
     {:AlarmUnhandledException {:sum 1 :count 1}}
+    {:AlarmHeartbeatFailed {:sum 1 :count 1}}
     {:AvailableMB 12}
     {:ObjectCacheCount 12}
     {:RemotePeers {:sum 1 :count 1}}
