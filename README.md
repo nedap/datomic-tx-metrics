@@ -1,6 +1,11 @@
 # datomic-tx-metrics
 Collecting Datomic Transactor + JVM metrics for consumption by [Prometheus](https://prometheus.io/) by offering a web endpoint.
 
+```clojure
+[com.nedap.staffing-solutions/datomic-tx-metrics "0.3.0-alpha1"]
+```
+
+
 ## How does it work?
 
 ### Registering the metrics collector at the transactor.
