@@ -20,7 +20,8 @@
                     {:username :env/artifactory_user
                      :password :env/artifactory_pass}}
 
-  :profiles {:ci {:pedantic?    :abort
-                  :jvm-opts     ["-Dclojure.main.report=stderr"]
-                  :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
-                  :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.6.0"]]}})
+  :profiles {:ncrw       {:global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
+                          :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.11.0"]]}
+
+             :ci       {:pedantic?    :abort
+                        :jvm-opts     ["-Dclojure.main.report=stderr"]}})
