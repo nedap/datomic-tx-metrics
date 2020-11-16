@@ -258,8 +258,8 @@
   "Called by Datomic transactor transferring its metrics."
   [tx-metrics]
   ;; If no server was running, start one now.
-  (swap! server (fn [server] (when-not server
-                               (start-metrics-server))))
+  (swap! server (fn [server] (or server (start-metrics-server))))
+
 
   (if-let [{:keys [sum]} (:AlarmIndexingJobFailed tx-metrics)]
     (prom/set! alarms "index-job-failed" sum)
